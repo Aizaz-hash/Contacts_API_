@@ -7,16 +7,40 @@ namespace Contacts_API.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class HotelBookingController : ControllerBase
+    public class ContactsController : ControllerBase
     {
         private readonly ContactsAPIdbContext _context;
 
-        public HotelBookingController(ContactsAPIdbContext context)
+        public ContactsController(ContactsAPIdbContext context)
         {
             _context = context;
         }
 
-        
+        // Create/Edit
+        [HttpPost]
+        public JsonResult createAndEdit(Contacts contacts)
+        {
+            if (contacts.Id == 0)
+            {
+                _context.Contacts.Add(contacts);
+            }
+            else
+            {
+                var contactsInDb = _context.Contacts.Find(contacts.Id);
+
+                if (contactsInDb == null)
+                    return new JsonResult(NotFound());
+
+                contactsInDb = contacts;
+            }
+
+            _context.SaveChanges();
+
+            return new JsonResult(Ok(contacts));
+
+        }
+
+
         // Get all
         [HttpGet()]
         public JsonResult GetAll()
@@ -38,29 +62,7 @@ namespace Contacts_API.Controllers
             return new JsonResult(Ok(result));
         }
 
-        // Create/Edit
-        [HttpPost]
-        public JsonResult CreateEdit(Contacts booking)
-        {
-            if (booking.Id == 0)
-            {
-                _context.Contacts.Add(booking);
-            }
-            else
-            {
-                var bookingInDb = _context.Contacts.Find(booking.Id);
-
-                if (bookingInDb == null)
-                    return new JsonResult(NotFound());
-
-                bookingInDb = booking;
-            }
-
-            _context.SaveChanges();
-
-            return new JsonResult(Ok(booking));
-
-        }
+ 
 
 
 
